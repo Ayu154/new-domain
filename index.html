@@ -1,93 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site Under Construction</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Test</title>
   <style>
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      background: linear-gradient(135deg, #ece9e6, #ffffff);
-      color: #333;
+      font-family: Poppins, Arial, sans-serif;
       text-align: center;
+      background: linear-gradient(135deg, #ece9e6, #ffffff);
       padding: 100px 20px;
-      line-height: 1.6;
     }
-
-    h1 {
-      font-size: 2rem;
-      color: #222;
-    }
-
-    p {
-      font-size: 1.1rem;
-      margin: 15px 0;
-    }
-
-    form {
-      max-width: 400px;
-      margin: 40px auto;
+    #loginContainer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
       background: #f8f9fa;
-      padding: 25px;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-
-    input, textarea {
-      width: 100%;
+    input {
+      width: 250px;
       padding: 10px;
-      margin: 10px 0;
       border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 1rem;
-      font-family: "Poppins", sans-serif;
     }
-
     button {
-      background-color: #0078ff;
-      color: white;
-      border: none;
       padding: 10px 20px;
       border-radius: 8px;
+      border: none;
+      background: #0078ff;
+      color: #fff;
       cursor: pointer;
-      transition: background 0.3s ease;
-      font-size: 1rem;
     }
-
-    button:hover {
-      background-color: #005fcc;
-    }
-
-    .emoji {
-      font-size: 1.4rem;
-    }
-
-    footer {
-      margin-top: 60px;
-      font-size: 0.9rem;
-      color: #555;
-    }
+    button:hover { background: #005fcc; }
+    #mainContent { display: none; }
+    #logoutBtn { background: #ff4d4d; }
   </style>
 </head>
 <body>
+  <div id="loginContainer">
+    <h2>🔐 Sign Up / Log In</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="signupBtn">Sign Up</button>
+    <button id="loginBtn">Log In</button>
+    <p id="status" style="color:red;"></p>
+  </div>
 
-  <h1>🚧 This Site is Under Construction 🚧</h1>
-  <p>We’re working hard to bring you something awesome. Stay tuned for our <strong>dynamic launch</strong>! 😁<span class="emoji">(●'◡'●)</span></p>
-  <p>PEACE! 😉🫡</p>
+  <div id="mainContent">
+    <button id="logoutBtn">Logout</button>
+    <h1>✅ Welcome to Your Site</h1>
+    <p>This is your protected area!</p>
+  </div>
 
-  <br>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const SUPABASE_URL = "https://dhweqtiyagxnovkomxzd.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRod2VxdGl5YWd4bm92a29teHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMwNDA4NDcsImV4cCI6MjA3ODYxNjg0N30.M1umYaWqyIOdnKj6nipVFA2opsw9JWEFetGnqBO8LVQ";
 
-  <h2>💬 Leave a Comment</h2>
-  <form action="https://formspree.io/f/xjkpnqky" method="POST">
-    <input type="text" name="name" placeholder="Your Name" required>
-    <input type="email" name="_replyto" placeholder="Your Email" required>
-    <textarea name="message" rows="5" placeholder="Your Message..." required></textarea>
-    <button type="submit">Send Message</button>
-  </form>
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <footer>
-    &copy; 2025 Ayush Lohani | All Rights Reserved
-  </footer>
+      const loginContainer = document.getElementById("loginContainer");
+      const mainContent = document.getElementById("mainContent");
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
+      const signupBtn = document.getElementById("signupBtn");
+      const loginBtn = document.getElementById("loginBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const status = document.getElementById("status");
 
+      // Sign Up
+      signupBtn.addEventListener("click", async () => {
+        status.textContent = "Creating account...";
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: email.value,
+          password: password.value,
+        });
+        if (error) {
+          status.textContent = "❌ " + error.message;
+        } else {
+          status.style.color = "green";
+          status.textContent = "✅ Account created! Please check your email to verify.";
+        }
+      });
+
+      // Log In
+      loginBtn.addEventListener("click", async () => {
+        status.textContent = "Logging in...";
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email.value,
+          password: password.value,
+        });
+        if (error) {
+          status.textContent = "❌ " + error.message;
+        } else {
+          status.style.color = "green";
+          status.textContent = "✅ Login successful!";
+          loginContainer.style.display = "none";
+          mainContent.style.display = "block";
+        }
+      });
+
+      // Check session on load
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        loginContainer.style.display = "none";
+        mainContent.style.display = "block";
+      }
+
+      // Logout
+      logoutBtn.addEventListener("click", async () => {
+        await supabaseClient.auth.signOut();
+        mainContent.style.display = "none";
+        loginContainer.style.display = "flex";
+      });
+    });
+  </script>
 </body>
 </html>
